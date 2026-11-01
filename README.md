@@ -10,7 +10,7 @@ Developed as a dedicated open-source research and engineering framework for buil
 
 ---
 
-## 🌟 Key Research Capabilities
+##  Key Research Capabilities
 
 ```
                            +-----------------------------------------------+
@@ -101,7 +101,7 @@ Visit the interactive research dashboard at `http://localhost:8000`.
 
 ---
 
-## 🧪 Benchmark Verification Output
+##  Benchmark Verification Output
 
 ```text
 Testing health_check...
@@ -124,7 +124,7 @@ ALL API ENDPOINTS FUNCTION PERFECTLY!
 
 ---
 
-## 📜 Citation & Author
+##  Citation & Author
 
 **Alaa Abdel Fattah Allam**  
 M.Sc. Student in Artificial Intelligence & Data Science  
