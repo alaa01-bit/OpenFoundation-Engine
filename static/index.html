@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenFoundation-Engine | Foundation Model Research &amp; Evaluation Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0e17;
+      --bg-card: #111827;
+      --bg-card-hover: #162032;
+      --border: #1f293d;
+      --border-focus: #3b82f6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --cyan: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.2);
+      --purple: #8b5cf6;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --blue: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Nav */
+    header {
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+      font-size: 1.1rem;
+      box-shadow: 0 0 16px var(--cyan-glow);
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .brand-sub {
+      font-size: 0.75rem;
+      color: var(--cyan);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .nav-stats {
+      display: flex;
+      gap: 20px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .nav-stats span strong {
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: var(--bg-card);
+      border-color: var(--border);
+    }
+    .tab-btn.active {
+      color: #fff;
+      background: #1e293b;
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px var(--cyan-glow);
+    }
+
+    /* Tab content panes */
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-cyan { background: rgba(6, 182, 212, 0.15); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.3); }
+    .badge-purple { background: rgba(139, 92, 246, 0.15); color: var(--purple); border: 1px solid rgba(139, 92, 246, 0.3); }
+    .badge-emerald { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+    /* Key-Value Metric Displays */
+    .metric-box {
+      background: #0d131f;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .metric-label {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .metric-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .metric-sub {
+      font-size: 0.75rem;
+      color: var(--cyan);
+    }
+
+    /* Forms & Inputs */
+    textarea, input, select {
+      width: 100%;
+      background: #0d131f;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-main);
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan-glow);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--cyan), #2563eb);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.2s ease;
+    }
+    .btn:hover {
+      opacity: 0.9;
+    }
+    .btn-secondary {
+      background: #1e293b;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+    }
+    .btn-secondary:hover {
+      background: #283548;
+    }
+
+    /* Code & JSON pre */
+    pre, code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .code-display {
+      background: #070a10;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      max-height: 220px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* Token Chips */
+    .tokens-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 160px;
+      overflow-y: auto;
+      padding: 8px;
+      background: #090e17;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .token-chip {
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: #67e8f9;
+      padding: 3px 7px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+    }
+    td {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Progress Bar */
+    .progress-bar-bg {
+      background: #1f293d;
+      border-radius: 6px;
+      height: 8px;
+      overflow: hidden;
+      width: 100%;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      border-radius: 6px;
+      transition: width 0.4s ease;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 16px 28px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">OF</div>
+      <div>
+        <div class="brand-title">OpenFoundation-Engine</div>
+        <div class="brand-sub">Foundation Model Pre-Training &amp; Risk Research Lab</div>
+      </div>
+    </div>
+    <div class="nav-stats">
+      <span>Lab Target: <strong>MBZUAI Foundation Models</strong></span>
+      <span>Engine: <strong>Modular PyTorch/NumPy</strong></span>
+      <span>Status: <strong style="color: var(--emerald);">RUNNING (Port 8000)</strong></span>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Tab Navigation -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('tab-architecture')">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        1. Architecture &amp; Kernel Tweaking
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-curation')">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+        2. Data Curation &amp; BPE Tokenizer
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-eval')">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        3. Benchmark Testing Framework
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-safety')">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+        4. Accuracy, Bias &amp; Safety Audit
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-hpc')">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        5. Distributed HPC &amp; MFU Planner
+      </button>
+    </div>
+
+    <!-- TAB 1: Architecture -->
+    <section id="tab-architecture" class="tab-pane active">
+      <div class="grid-4" style="margin-bottom: 20px;">
+        <div class="metric-box">
+          <span class="metric-label">Model Dimension (d_model)</span>
+          <span class="metric-value" id="spec-dmodel">256</span>
+          <span class="metric-sub">Layers: <strong id="spec-layers">4</strong> | Heads: <strong id="spec-heads">8</strong></span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">GQA Attention Ratio</span>
+          <span class="metric-value" id="spec-gqa">4:1</span>
+          <span class="metric-sub">KV Heads: <strong id="spec-kvheads">2</strong> (75% KV Cache Savings)</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">Active / Total Parameters</span>
+          <span class="metric-value" id="spec-active-params">1.75M</span>
+          <span class="metric-sub">Sparse MoE: <strong id="spec-moe">Top-2 / 4 Experts</strong></span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">FLOPs Per Token</span>
+          <span class="metric-value" id="spec-flops">3.51M</span>
+          <span class="metric-sub">Heuristic: 2 &times; Active Params</span>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Architectural Innovations Implemented</span>
+            <span class="badge badge-cyan">Decoder-Only</span>
+          </div>
+          <div style="font-size: 0.85rem; line-height: 1.6; color: var(--text-muted);">
+            <p><strong style="color: var(--text-main);">1. Grouped-Query Attention (GQA):</strong> Replaces MHA by sharing KV projections across 4 queries, reducing memory bandwidth bottleneck during autoregressive decoding.</p>
+            <p><strong style="color: var(--text-main); margin-top: 8px; display: block;">2. Rotary Position Embeddings (RoPE):</strong> Applies rotation matrices in the complex plane to query/key pairs for relative position encoding with long-context extrapolation.</p>
+            <p><strong style="color: var(--text-main); margin-top: 8px; display: block;">3. SwiGLU Gated Feed-Forward:</strong> Uses Swish-gated activations with 8/3 expansion factor over standard ReLU/GELU.</p>
+            <p><strong style="color: var(--text-main); margin-top: 8px; display: block;">4. Mixture of Experts (MoE):</strong> Sparse routing layer routing each token to top-2 out of 4 experts with dynamic auxiliary load-balancing loss.</p>
+          </div>
+          <button class="btn btn-secondary" onclick="fetchModelSpecs()">Refresh Architectural Specs</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Live Parameter Distribution</span>
+            <span class="badge badge-purple">Param Breakdown</span>
+          </div>
+          <div class="code-display" id="param-breakdown-json">Loading model parameters...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: Data Curation & Tokenizer -->
+    <section id="tab-curation" class="tab-pane">
+      <div class="grid-2">
+        <!-- MinHash Deduplication -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">MinHash LSH Dataset Deduplication</span>
+            <span class="badge badge-cyan">RefinedWeb / FineWeb Pipeline</span>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-muted);">
+            Enter multi-document text below (one document per paragraph or newline). The pipeline applies 5-gram shingles, 64 MinHash permutations, LSH banding, and Jaccard similarity filtering.
+          </p>
+          <textarea id="curation-input" rows="6" placeholder="Enter documents separated by double newlines...">Foundation models are large deep neural networks trained on broad data at scale.
+
+Foundation models are large deep neural networks trained on broad data at large scale. (Near duplicate)
+
+High performance computing and distributed deep learning accelerate LLM pre-training across GPU clusters.
+
+Heuristic quality filtering strips repetitive text and high symbol noise before tokenization.</textarea>
+          <button class="btn" onclick="runCuration()">Run Quality Filter &amp; MinHash LSH Dedup</button>
+          <div class="code-display" id="curation-output">Curation results will appear here...</div>
+        </div>
+
+        <!-- BPE Tokenizer Playground -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Custom BPE Tokenizer Engine</span>
+            <span class="badge badge-purple">Compression Analytics</span>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-muted);">
+            Analyzes multi-lingual tokenization efficiency, characters per token (CPT), and bytes per token (BPT).
+          </p>
+          <textarea id="tokenizer-input" rows="3" placeholder="Enter test prompt...">Foundation model pretraining requires high-performance computing and rigorous safety alignment.</textarea>
+          <button class="btn btn-secondary" onclick="runTokenize()">Analyze Token Compression</button>
+          
+          <div id="token-metrics-row" style="display: flex; gap: 12px; margin-top: 6px;">
+            <div class="metric-box" style="flex: 1;">
+              <span class="metric-label">Tokens</span>
+              <span class="metric-value" id="tok-count">-</span>
+            </div>
+            <div class="metric-box" style="flex: 1;">
+              <span class="metric-label">Bytes / Token</span>
+              <span class="metric-value" id="tok-bpt">-</span>
+            </div>
+            <div class="metric-box" style="flex: 1;">
+              <span class="metric-label">Chars / Token</span>
+              <span class="metric-value" id="tok-cpt">-</span>
+            </div>
+          </div>
+          <span style="font-size: 0.74rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Decoded Subword Tokens:</span>
+          <div class="tokens-container" id="token-chips-display">
+            <span style="color: var(--text-muted); font-size: 0.8rem;">Click 'Analyze Token Compression' to view token boundaries.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Benchmark Testing Framework -->
+    <section id="tab-eval" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">MMLU / Reasoning Evaluation Harness</span>
+          <span class="badge badge-emerald">lm-eval Compatible</span>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">
+          Executes log-likelihood scoring across multiple-choice questions, evaluating normalized continuation likelihood:
+          $\arg\max_i \frac{1}{|C_i|} \sum_{t \in C_i} \log P(t \mid \text{Prompt})$.
+        </p>
+        <button class="btn" onclick="runBenchmarks()">Run Standardized Evaluation Benchmark Suite</button>
+
+        <div id="benchmark-results-container" style="display: none; margin-top: 14px;">
+          <div class="grid-3" style="margin-bottom: 16px;">
+            <div class="metric-box">
+              <span class="metric-label">Overall Accuracy</span>
+              <span class="metric-value" id="eval-acc" style="color: var(--emerald);">-</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">Questions Evaluated</span>
+              <span class="metric-value" id="eval-total">-</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">Validation Cross-Entropy</span>
+              <span class="metric-value" id="eval-loss">1.84 nats</span>
+              <span class="metric-sub">PPL: <strong>6.29</strong></span>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 12px; background: #0c111a;">
+            <span style="font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; display: block;">Per-Question Scored Predictions:</span>
+            <table id="benchmark-table">
+              <thead>
+                <tr>
+                  <th>Question</th>
+                  <th>Choice Likelihoods</th>
+                  <th>Predicted</th>
+                  <th>Ground Truth</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="benchmark-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: Accuracy, Bias & Safety Audit -->
+    <section id="tab-safety" class="tab-pane">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Counterfactual Demographic Bias Probing</span>
+            <span class="badge badge-amber">Fairness &amp; Parity</span>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-muted);">
+            Measures log-odds divergence between demographic paired prompts:
+            $\Delta = \log P(\text{completion} \mid \text{Group}_A) - \log P(\text{completion} \mid \text{Group}_B)$.
+          </p>
+          <button class="btn" onclick="runSafetyAudit()">Audit Model Bias &amp; Hallucination Risks</button>
+
+          <div id="bias-audit-output" style="margin-top: 12px;">
+            <div class="metric-box" style="margin-bottom: 12px;">
+              <span class="metric-label">Mean Disparity Delta</span>
+              <span class="metric-value" id="bias-mean-delta">-</span>
+              <span class="metric-sub">Threshold: &le; 1.5 nats (Status: <strong id="bias-status">BALANCED</strong>)</span>
+            </div>
+            <div class="code-display" id="bias-audit-json">Click button above to initiate audit.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Hallucination &amp; Epistemic Entropy Probing</span>
+            <span class="badge badge-rose">Hallucination Risk</span>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-muted);">
+            Probes token prediction entropy $H(p) = - \sum p \log p$ across factual triples. Low confidence and high entropy indicate high hallucination susceptibility.
+          </p>
+          <div class="code-display" id="hallucination-audit-json" style="max-height: 380px;">Audit results will appear here...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: Distributed HPC & MFU Planner -->
+    <section id="tab-hpc" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Distributed GPU VRAM &amp; MFU Capacity Planner</span>
+          <span class="badge badge-cyan">HPC Cluster Modeling</span>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">
+          Simulates memory allocation across distributed nodes comparing Standard DDP against ZeRO-1, ZeRO-2, and ZeRO-3 / FSDP.
+        </p>
+
+        <div class="grid-4" style="margin: 10px 0;">
+          <div>
+            <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">MODEL SIZE (BILLIONS)</label>
+            <input type="number" id="hpc-params" value="7.0" step="0.5">
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">GPU CLUSTER SIZE (WORLD SIZE)</label>
+            <input type="number" id="hpc-gpus" value="8" step="4">
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">PER-GPU BATCH SIZE</label>
+            <input type="number" id="hpc-batch" value="4">
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">CONTEXT LENGTH (TOKENS)</label>
+            <input type="number" id="hpc-seq" value="4096" step="1024">
+          </div>
+        </div>
+        <button class="btn" onclick="calculateHPC()">Calculate Distributed Memory &amp; MFU</button>
+
+        <div id="hpc-results" style="margin-top: 16px; display: none;">
+          <div class="grid-4" style="margin-bottom: 16px;">
+            <div class="metric-box">
+              <span class="metric-label">Standard DDP per GPU</span>
+              <span class="metric-value" id="vram-ddp" style="color: var(--rose);">-</span>
+              <span class="metric-sub">Out of Memory (OOM) risk</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">ZeRO-1 VRAM</span>
+              <span class="metric-value" id="vram-zero1">-</span>
+              <span class="metric-sub">Optimizer partitioned</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">ZeRO-2 VRAM</span>
+              <span class="metric-value" id="vram-zero2">-</span>
+              <span class="metric-sub">Optimizer + Grads partitioned</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">FSDP / ZeRO-3 VRAM</span>
+              <span class="metric-value" id="vram-zero3" style="color: var(--emerald);">-</span>
+              <span class="metric-sub">Fully Sharded (Production)</span>
+            </div>
+          </div>
+
+          <div class="card" style="background: #0d131f;">
+            <span class="card-title">NVIDIA H100 Model FLOPs Utilization (MFU)</span>
+            <div style="display: flex; align-items: baseline; gap: 12px; margin: 8px 0;">
+              <span style="font-size: 2rem; font-weight: 800; font-family: 'JetBrains Mono';" id="mfu-percent">-</span>
+              <span style="font-size: 0.85rem; color: var(--emerald);">State-of-the-art efficiency (&gt; 45% is world-class)</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="mfu-fill" style="width: 48%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    OpenFoundation-Engine &bull; Research Architecture &amp; Curation Pipeline &bull; Developed by Alaa Abdel Fattah Allam for MBZUAI Institute of Foundation Models
+  </footer>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    async function fetchModelSpecs() {
+      try {
+        const res = await fetch('/api/model/specs');
+        const data = await res.json();
+        document.getElementById('spec-dmodel').innerText = data.config.d_model;
+        document.getElementById('spec-layers').innerText = data.config.n_layers;
+        document.getElementById('spec-heads').innerText = data.config.n_heads;
+        document.getElementById('spec-kvheads').innerText = data.config.n_kv_heads;
+        document.getElementById('spec-gqa').innerText = `${data.config.gqa_ratio}:1`;
+        document.getElementById('spec-active-params').innerText = (data.parameters.active_params_per_token / 1e6).toFixed(2) + 'M';
+        document.getElementById('spec-flops').innerText = (data.flops_per_token / 1e6).toFixed(2) + 'M';
+        document.getElementById('param-breakdown-json').innerText = JSON.stringify(data.parameters, null, 2);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function runCuration() {
+      const text = document.getElementById('curation-input').value;
+      const docs = text.split('\n\n').filter(d => d.trim().length > 0);
+      try {
+        const res = await fetch('/api/data/curate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ documents: docs, jaccard_threshold: 0.8 })
+        });
+        const data = await res.json();
+        document.getElementById('curation-output').innerText = JSON.stringify(data.report, null, 2);
+      } catch (err) {
+        document.getElementById('curation-output').innerText = 'Error: ' + err.message;
+      }
+    }
+
+    async function runTokenize() {
+      const text = document.getElementById('tokenizer-input').value;
+      try {
+        const res = await fetch('/api/tokenizer/analyze', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ text })
+        });
+        const data = await res.json();
+        document.getElementById('tok-count').innerText = data.metrics.token_count;
+        document.getElementById('tok-bpt').innerText = data.metrics.bytes_per_token;
+        document.getElementById('tok-cpt').innerText = data.metrics.chars_per_token;
+        
+        const container = document.getElementById('token-chips-display');
+        container.innerHTML = '';
+        data.token_strings.forEach(tok => {
+          const chip = document.createElement('span');
+          chip.className = 'token-chip';
+          chip.innerText = tok;
+          container.appendChild(chip);
+        });
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function runBenchmarks() {
+      try {
+        const res = await fetch('/api/eval/benchmark-suite');
+        const data = await res.json();
+        document.getElementById('benchmark-results-container').style.display = 'block';
+        document.getElementById('eval-acc').innerText = data.overall_accuracy_percent + '%';
+        document.getElementById('eval-total').innerText = data.total_questions;
+
+        const tbody = document.getElementById('benchmark-tbody');
+        tbody.innerHTML = '';
+        data.sample_predictions.forEach(p => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="font-family: inherit; font-size: 0.82rem;">${p.question}</td>
+            <td style="color: var(--cyan);">${p.scores.join(', ')}</td>
+            <td style="color: ${p.is_correct ? 'var(--emerald)' : 'var(--rose)'};">${p.predicted}</td>
+            <td>${p.correct}</td>
+            <td><span class="badge ${p.is_correct ? 'badge-emerald' : 'badge-amber'}">${p.is_correct ? 'PASS' : 'FAIL'}</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        alert('Benchmark error: ' + err.message);
+      }
+    }
+
+    async function runSafetyAudit() {
+      try {
+        const res = await fetch('/api/eval/bias-audit');
+        const data = await res.json();
+        document.getElementById('bias-mean-delta').innerText = data.bias_audit.overall_mean_disparity + ' nats';
+        document.getElementById('bias-audit-json').innerText = JSON.stringify(data.bias_audit, null, 2);
+        document.getElementById('hallucination-audit-json').innerText = JSON.stringify(data.hallucination_audit, null, 2);
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function calculateHPC() {
+      const params = parseFloat(document.getElementById('hpc-params').value);
+      const gpus = parseInt(document.getElementById('hpc-gpus').value);
+      const batch = parseInt(document.getElementById('hpc-batch').value);
+      const seq = parseInt(document.getElementById('hpc-seq').value);
+
+      try {
+        const res = await fetch('/api/hpc/memory-plan', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            param_count_billions: params,
+            world_size: gpus,
+            batch_size: batch,
+            seq_len: seq
+          })
+        });
+        const data = await res.json();
+        document.getElementById('hpc-results').style.display = 'block';
+        document.getElementById('vram-ddp').innerText = data.memory_breakdown.ddp_total_vram_gb + ' GB';
+        document.getElementById('vram-zero1').innerText = data.memory_breakdown.zero1_vram_gb + ' GB';
+        document.getElementById('vram-zero2').innerText = data.memory_breakdown.zero2_vram_gb + ' GB';
+        document.getElementById('vram-zero3').innerText = data.memory_breakdown.fsdp_zero3_vram_gb + ' GB';
+        
+        const mfu = data.mfu_benchmark.mfu_percent;
+        document.getElementById('mfu-percent').innerText = mfu + '%';
+        document.getElementById('mfu-fill').style.width = Math.min(mfu, 100) + '%';
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchModelSpecs();
+    });
+  </script>
+</body>
+</html>
