@@ -156,3 +156,4 @@ class DistributedMemoryPlanner:
             "theoretical_peak_tflops": round(theoretical_peak / 1e12, 2),
             "mfu_percent": round(mfu_percent, 2)
         }
+

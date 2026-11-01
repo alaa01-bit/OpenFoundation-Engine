@@ -153,3 +153,4 @@ class EvaluationHarness:
             "category_breakdown": category_breakdown,
             "sample_predictions": predictions[:5]
         }
+

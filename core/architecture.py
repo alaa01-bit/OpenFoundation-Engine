@@ -385,3 +385,4 @@ class FoundationModel:
         param_counts = self.count_parameters()
         active_params = param_counts["active_params_per_token"]
         return 2 * active_params
+

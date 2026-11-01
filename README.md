@@ -131,3 +131,4 @@ M.Sc. Student in Artificial Intelligence & Data Science
 Arab Academy for Science, Technology and Maritime Transport (AASTMT)  
 *AI Research Consultant, National Research Centre (NRC)*  
 *GitHub:* [@alaa01-bit](https://github.com/alaa01-bit) &bull; *LinkedIn:* [alaa-a-allam](https://linkedin.com/in/alaa-a-allam)
+
